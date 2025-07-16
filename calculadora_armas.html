@@ -1,0 +1,138 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8" />
+<title>Calculadora Armería RP</title>
+<style>
+  body { font-family: Arial, sans-serif; background-color: #111; color: #eee; padding: 20px; }
+  h2 { color: #0f0; }
+  label, select, input { margin-top: 10px; display: block; }
+  input[type="number"] { width: 80px; }
+  .item-group { margin-bottom: 15px; }
+  #total { font-size: 1.5em; color: #0f0; margin-top: 20px; }
+  button { margin-top: 10px; padding: 10px 20px; margin-right: 10px; cursor: pointer; }
+  ul { padding-left: 20px; }
+</style>
+</head>
+<body>
+
+<h2>🔫 Calculadora Armería Roleplay</h2>
+
+<form id="calcForm" onsubmit="return false;">
+  <div class="item-group">
+    <label for="item">Selecciona un ítem:</label>
+    <select id="item">
+      <optgroup label="🪓 Armas">
+        <option value="240">Bate</option>
+        <option value="440">Cuchillo</option>
+        <option value="640">Navaja</option>
+        <option value="700">Puño americano</option>
+        <option value="1600">Pistola 9mm</option>
+        <option value="1800">Pistola .50</option>
+        <option value="2000">Revólver</option>
+      </optgroup>
+      <optgroup label="🔫 Balas (1€ cada 10 unidades)">
+        <option value="1" data-pack-size="10">Balas 9mm</option>
+        <option value="1" data-pack-size="10">Balas .50 AE</option>
+        <option value="1" data-pack-size="10">Balas .38 LC</option>
+        <option value="1" data-pack-size="10">Balas .45 ACP</option>
+        <option value="1" data-pack-size="10">Balas 5.56x45</option>
+        <option value="1" data-pack-size="10">Balas 7.62x39</option>
+      </optgroup>
+      <optgroup label="🛡️ Protección">
+        <option value="60">Chaleco</option>
+        <option value="60">Paracaídas</option>
+      </optgroup>
+      <optgroup label="🔧 Accesorios">
+        <option value="40">Linterna</option>
+        <option value="100">Compensador</option>
+        <option value="40">Silenciador</option>
+        <option value="40">Silenciador pesado</option>
+        <option value="40">Empuñadura</option>
+        <option value="40">Cargador ext. pistola</option>
+        <option value="40">Cargador ext. pesado</option>
+        <option value="60">Cargador ext. escopeta</option>
+        <option value="60">Cargador ext. rifle</option>
+        <option value="80">Cargador ext. franco</option>
+        <option value="80">Tambor smg</option>
+        <option value="80">Tambor escopeta</option>
+        <option value="60">Tambor rifle</option>
+        <option value="40">Mira x1</option>
+        <option value="40">Mira x3</option>
+        <option value="40">Mira x5</option>
+        <option value="60">Mira avanzada</option>
+        <option value="60">Mira NV</option>
+        <option value="60">Mira térmica</option>
+        <option value="60">Mira holográfica</option>
+      </optgroup>
+      <optgroup label="🛠️ Reparación">
+        <option value="1200">Reparar Pistola</option>
+      </optgroup>
+    </select>
+  </div>
+
+  <label for="quantity">Cantidad:</label>
+  <input type="number" id="quantity" value="1" min="1" />
+
+  <button type="button" onclick="addItem()">Agregar</button>
+  <button type="button" onclick="resetCalc()">Reiniciar</button>
+</form>
+
+<h3>🧾 Lista de compras:</h3>
+<ul id="itemList"></ul>
+
+<div id="total">Total: 0€</div>
+
+<script>
+  let total = 0;
+  const itemList = document.getElementById("itemList");
+  const totalDisplay = document.getElementById("total");
+  const itemSelect = document.getElementById("item");
+  const quantityInput = document.getElementById("quantity");
+
+  function formatPrice(amount) {
+    return (amount % 1 === 0) ? amount.toFixed(0) + "€" : amount.toFixed(2) + "€";
+  }
+
+  function addItem() {
+    const quantity = parseInt(quantityInput.value);
+    if (quantity <= 0 || isNaN(quantity)) {
+      alert("Por favor, ingresa una cantidad válida mayor que 0.");
+      return;
+    }
+
+    const selectedOption = itemSelect.options[itemSelect.selectedIndex];
+    const basePrice = parseFloat(selectedOption.value);
+    const packSize = parseInt(selectedOption.getAttribute("data-pack-size")) || 1;
+    const selectedText = selectedOption.text;
+
+    let cost = 0;
+    let displayQuantity = quantity;
+
+    if (packSize > 1) {
+      const packages = Math.ceil(quantity / packSize);
+      cost = packages * basePrice;
+      displayQuantity = quantity;
+    } else {
+      cost = quantity * basePrice;
+    }
+
+    total += cost;
+    total = Math.round(total * 100) / 100;  // Redondeo para evitar decimales raros
+
+    const li = document.createElement("li");
+    li.textContent = `${selectedText} x${displayQuantity} = ${formatPrice(cost)}`;
+    itemList.appendChild(li);
+
+    totalDisplay.textContent = `Total: ${formatPrice(total)}`;
+  }
+
+  function resetCalc() {
+    total = 0;
+    itemList.innerHTML = "";
+    totalDisplay.textContent = "Total: 0€";
+  }
+</script>
+
+</body>
+</html>
